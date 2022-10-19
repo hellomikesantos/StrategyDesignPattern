@@ -1,60 +1,117 @@
-﻿Compression newCompress = new WindowsZipCompression();
-newCompress.PerformCompression();
-Compression newCompress2 = new WindowsRARCompression();
-newCompress2.PerformCompression();
+﻿// abstract beverage class
+Beverage testCoffee = new DripCoffee();
+Console.WriteLine(testCoffee.GetDescription());
+Console.WriteLine(testCoffee.Cost());
 
-public class Client
+testCoffee = new Sugar(testCoffee);
+Console.WriteLine(testCoffee.GetDescription());
+Console.WriteLine(testCoffee.Cost());
+
+Console.WriteLine("Add more sugar");
+testCoffee = new Sugar(testCoffee);
+Console.WriteLine(testCoffee.GetDescription());
+Console.WriteLine(testCoffee.Cost());
+
+testCoffee = new MilkCondiment(testCoffee);
+Console.WriteLine(testCoffee.GetDescription());
+Console.WriteLine(testCoffee.Cost());
+
+Beverage milk = new MilkBeverage();
+milk = new MilkCondiment(milk);
+milk = new MilkCondiment(milk);
+milk = new Sugar(milk);
+
+Console.WriteLine(milk.GetDescription());
+Console.WriteLine(milk.Cost());
+
+public abstract class Beverage
 {
-
-}
-public abstract class Compression
-{
-    public ICompressionBehaviour CompressionBehaviour { get; set; }
-
-    public void PerformCompression()
+    //protected means only inheriting child classes can use it
+    protected string _description { get; set; } 
+    public virtual string GetDescription()
     {
-        CompressionBehaviour.Compress();
+        return _description;
     }
 
-
-}
-public class WindowsZipCompression : Compression
-{
-    public WindowsZipCompression()
+    protected double _cost { get; set; }
+    public virtual double Cost()
     {
-        CompressionBehaviour = new ZIPCompressBehaviour();
-    }
-}
-
-public class WindowsRARCompression : Compression
-{
-    public WindowsRARCompression()
-    {
-        CompressionBehaviour = new RARCompressBehaviour();
-    }
-}
-
-    public interface ICompressionBehaviour
-{
-    public void Compress()
-    {
-        Console.WriteLine("This is a compressor");
+        return _cost;
     }
 }
 
-public class RARCompressBehaviour : ICompressionBehaviour
+// concrete class meaning a class that can be instantiated
+public class DripCoffee : Beverage
 {
-    public void Compress()
+    public DripCoffee()
     {
-        Console.WriteLine("Compressing as RAR");
+        _cost = 1.00;
+        _description = "Columbian Coffee";
+    }
+    
+}
+
+public class Tea : Beverage
+{
+    public Tea()
+    {
+        _cost = 1.00;
+        _description = "English Tea";
     }
 }
 
-public class ZIPCompressBehaviour : ICompressionBehaviour
+public class MilkBeverage : Beverage
 {
-    public void Compress()
+    public MilkBeverage()
     {
-        Console.WriteLine("Compressing as Zip");
+        _description = "Milk Beverage";
+        _cost = 1.49;
     }
 }
 
+public abstract class CondimentDecorator : Beverage
+{
+    public Beverage Beverage { get; set; }
+    public abstract override string GetDescription();
+    public abstract override double Cost();
+}
+
+public class Sugar: CondimentDecorator
+{
+    public override double Cost()
+    {
+        return Beverage.Cost() + _cost;
+    }
+
+    public override string GetDescription()
+    {
+        return $"{Beverage.GetDescription()}, {_description}";
+    }
+
+    public Sugar(Beverage beverage)
+    {
+        Beverage = beverage;
+        _cost = 0.2;
+        _description = "Sugar";
+    }
+} 
+
+public class MilkCondiment  : CondimentDecorator
+{
+    public override double Cost()
+    {
+        return Beverage.Cost() + _cost;
+    }
+
+    public override string GetDescription()
+    {
+        return $"{Beverage.GetDescription()}, {_description}";
+    }
+
+    public MilkCondiment(Beverage beverage)
+    {
+        Beverage = beverage;
+        _cost = 1.49;
+        _description = "Milk";
+    }
+}
