@@ -24,6 +24,11 @@ milk = new Sugar(milk);
 Console.WriteLine(milk.GetDescription());
 Console.WriteLine(milk.Cost());
 
+Car newHondaCar = new Honda("2021", "CRV", 31000, "black", "Compact SUV");
+newHondaCar = new LeatherSeats(newHondaCar, "Black Leather Seats");
+
+Console.WriteLine(newHondaCar.GetDetails());
+
 public abstract class Beverage
 {
     //protected means only inheriting child classes can use it
@@ -48,7 +53,6 @@ public class DripCoffee : Beverage
         _cost = 1.00;
         _description = "Columbian Coffee";
     }
-    
 }
 
 public class Tea : Beverage
@@ -113,5 +117,89 @@ public class MilkCondiment  : CondimentDecorator
         Beverage = beverage;
         _cost = 1.49;
         _description = "Milk";
+    }
+}
+
+
+
+
+
+public abstract class Car
+{
+    // should have protected properties
+    protected string _year { get; set; }
+    protected string _model { get; set; }
+    protected int _basePrice { get; set; }
+    protected string _color { get; set; }
+    protected string _bodyType { get; set; }
+    public virtual string GetDetails()
+    {
+        return $"Year model: {_year} {_model}," +
+            $"Base price: {_basePrice}" +
+            $"Color and Body Type: {_color} {_bodyType}";
+    }
+}
+
+public class Honda : Car
+{
+    public Honda(string year,
+        string model, 
+        int basePrice, 
+        string color, 
+        string bodyType)
+    {
+        _year = year;
+        _model = model;
+        _basePrice = basePrice;
+        _color = color;
+        _bodyType = bodyType;
+    }
+}
+
+public abstract class UpgradesDecorator : Car
+{
+    public Car Car { get; set; }
+    public abstract override string GetDetails();
+}
+
+public class LeatherSeats : UpgradesDecorator
+{
+    public string _upgrades { get; set; }
+    public LeatherSeats(Car car, string upgrades)
+    {
+        Car = car;
+        _upgrades = upgrades;
+    }
+    public override string GetDetails()
+    {
+        return $"{Car.GetDetails()} Upgrades added: {_upgrades}";
+    }
+}
+
+public class IgnitionButton : UpgradesDecorator
+{
+    public string _upgrades { get; set; }
+    public IgnitionButton(Car car, string upgrades)
+    {
+        Car = car;
+        _upgrades = upgrades;
+    }
+    public override string GetDetails()
+    {
+        return $"{Car.GetDetails()} Upgrades added: {_upgrades}";
+    }
+}
+
+public class HybridEngine : UpgradesDecorator
+{
+    public string _upgrades { get; set; }
+    public HybridEngine(Car car, string upgrades)
+    {
+        Car = car;
+        _upgrades = upgrades;
+    }
+    public override string GetDetails()
+    {
+        return $"{Car.GetDetails()} Upgrades added: {_upgrades}";
     }
 }
