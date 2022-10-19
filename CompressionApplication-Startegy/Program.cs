@@ -26,8 +26,9 @@ Console.WriteLine(milk.Cost());
 
 Car newHondaCar = new Honda("2021", "CRV", 31000, "black", "Compact SUV");
 newHondaCar = new LeatherSeats(newHondaCar, "Black Leather Seats");
-
+newHondaCar = new LeatherSeats(newHondaCar, "Red Leather Seats");
 Console.WriteLine(newHondaCar.GetDetails());
+
 
 public abstract class Beverage
 {
@@ -134,9 +135,9 @@ public abstract class Car
     protected string _bodyType { get; set; }
     public virtual string GetDetails()
     {
-        return $"Year model: {_year} {_model}," +
-            $"Base price: {_basePrice}" +
-            $"Color and Body Type: {_color} {_bodyType}";
+        return $"Year model: {_year} {_model}, " +
+            $"Base price: {_basePrice} " +
+            $"Color and Body Type: {_color} {_bodyType} ";
     }
 }
 
@@ -160,15 +161,15 @@ public abstract class UpgradesDecorator : Car
 {
     public Car Car { get; set; }
     public abstract override string GetDetails();
+    public string _upgrades { get; set; }
 }
 
 public class LeatherSeats : UpgradesDecorator
 {
-    public string _upgrades { get; set; }
     public LeatherSeats(Car car, string upgrades)
     {
         Car = car;
-        _upgrades = upgrades;
+        _upgrades += upgrades;
     }
     public override string GetDetails()
     {
