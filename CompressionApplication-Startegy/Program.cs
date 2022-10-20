@@ -204,3 +204,7 @@ public class HybridEngine : UpgradesDecorator
         return $"{Car.GetDetails()} Upgrades added: {_upgrades}";
     }
 }
+
+// Swagger
+// GET cars/tires
+// add new endpoints that send responses
