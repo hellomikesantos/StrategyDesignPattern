@@ -1,158 +1,221 @@
-﻿Compression newCompress = new WindowsZipCompression();
-newCompress.PerformCompression();
-Compression newCompress2 = new WindowsRARCompression();
-newCompress2.PerformCompression();
+﻿//PizzaStore winnipeg = new WinnipegPizzaStore();
+//PizzaStore newfoundland = new NewFoundLandPizzaStore();
 
-Client user = new User("michael", "michael@mitt.ca", 20);
-user.HandleAccess(50, false);
-Client manager = new Manager();
-manager.HandleAccess(40, true);
-manager.HandleAccess(40, false);
-Client admin = new Admin();
-admin.HandleAccess(50, true);
+//winnipeg.OrderPizza("special");
+//newfoundland.OrderPizza("special");
 
+ToyFactory lego = new LegoToyFactory();
+ToyFactory mattell = new MattellToyFactory();
+lego.OrderToy("doll");
+mattell.OrderToy("doll");
+lego.OrderToy("car");
+mattell.OrderToy("car");
 
-public abstract class Compression
+public abstract class PizzaStore
 {
-    public ICompressionBehaviour CompressionBehaviour { get; set; }
-
-    public void PerformCompression()
+    public Pizza OrderPizza(string type)
     {
-        CompressionBehaviour.Compress();
+
+        // this process will never change, regardless of what our store is
+        Pizza pizza;
+        pizza = CreatePizza(type);
+
+        pizza.Prepare();
+        pizza.Bake();
+        pizza.Cut();
+
+        return pizza;
     }
 
-
-}
-public class WindowsZipCompression : Compression
-{
-    public WindowsZipCompression()
-    {
-        CompressionBehaviour = new ZIPCompressBehaviour();
-    }
-}
-
-public class WindowsRARCompression : Compression
-{
-    public WindowsRARCompression()
-    {
-        CompressionBehaviour = new RARCompressBehaviour();
-    }
+    // how we instantiate the Pizza depends upon the type of store
+    protected abstract Pizza CreatePizza(string type);
 }
 
-public interface ICompressionBehaviour
+public class NewFoundLandPizzaStore : PizzaStore
 {
-    public void Compress()
+    protected override Pizza CreatePizza(string type)
     {
-        Console.WriteLine("This is a compressor");
-    }
-}
-
-public class RARCompressBehaviour : ICompressionBehaviour
-{
-    public void Compress()
-    {
-        Console.WriteLine("Compressing as RAR");
-    }
-}
-
-public class ZIPCompressBehaviour : ICompressionBehaviour
-{
-    public void Compress()
-    {
-        Console.WriteLine("Compressing as Zip");
-    }
-}
-
-public abstract class Client
-{
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public int? Age { get; set; }
-    public bool AccessDisabled { get; set; }
-    public IAccessHandler AccessHandler { get; set; } 
-
-    public void HandleAccess(int? reputation, bool accessDisabled)
-    {
-        AccessHandler.GetAccess(reputation, accessDisabled);
-    }
-}
-
-public class User : Client
-{
-    public int Reputation { get; set; }
-    public User(string name, string email, int? age)
-    {
-        Name = name;
-        Email = email;
-        Age = age;
-        AccessHandler = new HasReputation();
-    }
-    public void HandleAccess(int? reputation, bool accessDisabled)
-    {
-        AccessHandler.GetAccess(reputation, accessDisabled);
-    }
-}
-
-public class Manager : Client
-{
-    public Manager()
-    {
-        AccessHandler = new HasAccessAutomatic();
-    }
-    public void HandleAccess(bool accessDisabled)
-    {
-        AccessHandler.GetAccess(null, accessDisabled);
-    }
-}
-
-public class Admin : Client
-{
-    public Admin()
-    {
-        AccessHandler = new HasAccessAutomatic();
-    }
-    public void HandleAccess(bool accessDisabled)
-    {
-        AccessHandler.GetAccess(null, accessDisabled);
-    }
-}
-
-public interface IAccessHandler
-{
-    public bool GetAccess(int? reputation, bool accessDisabled);
-}
-
-public class HasReputation : IAccessHandler
-{
-
-    public bool GetAccess(int? reputation, bool accessDisabled)
-    {
-        if (reputation > 20)
+        // declare the pizza
+        Pizza pizza;
+        switch (type)
         {
-            Console.WriteLine("This Client has a reputation.");
-            return true;
+            case "lobster":
+                pizza = new LobsterPizza();
+                break;
+            case "cheese":
+                pizza = new CheddarPizza();
+                break;
+            default:
+                throw new Exception();
         }
-        else
-        {
-            Console.WriteLine("NO REPUTATION!!!");
-            return false;
-        }
+        return pizza;
     }
 }
 
-public class HasAccessAutomatic : IAccessHandler
+public class WinnipegPizzaStore : PizzaStore
 {
-    public bool GetAccess(int? reputation, bool accessDisabled)
+    protected override Pizza CreatePizza(string type)
     {
-        if (!accessDisabled)
+        Pizza pizza;
+        switch (type)
         {
-            Console.WriteLine("This client has automatic access.");
-            return true;
+            case "special":
+                pizza = new SlurpeePizza();
+                break;
+            case "cheese":
+                pizza = new MozzarellaPizza();
+                break;
+            default:
+                throw new Exception();
         }
-        else
+        return pizza;
+    }
+}
+
+
+
+public abstract class Pizza
+{
+    public void Bake()
+    {
+        Console.WriteLine("Baking the pizza");
+    }
+
+    public void Prepare()
+    {
+        Console.WriteLine("Preparing the pizza");
+    }
+
+    public void Cut()
+    {
+        Console.WriteLine("Cutting the pizza");
+    }
+}
+
+public class LobsterPizza : Pizza
+{
+
+}
+
+public class CheddarPizza : Pizza
+{
+
+}
+
+public class MozzarellaPizza : Pizza
+{
+
+}
+
+public class PoutinePizza
+{
+
+}
+
+public class SlurpeePizza : Pizza
+{
+
+}
+
+
+public abstract class Toy
+{
+    public string _description { get; set; }
+    public void Paint()
+    {
+        Console.WriteLine("They toy has been painted");
+    }
+    public void Package()
+    {
+        Console.WriteLine("They toy has been packaged");
+    }
+}
+
+public class BarbieDoll : Toy
+{
+    public BarbieDoll()
+    {
+        _description = "Barbie Doll";
+    }
+}
+
+public class Minifigure : Toy
+{
+    public Minifigure()
+    {
+        _description = "Minifigure";
+    }
+}
+
+public class MatellCar : Toy
+{
+    public MatellCar()
+    {
+        _description = "Mattell Car";
+    }
+}
+
+public class LegoCar : Toy
+{
+    public LegoCar()
+    {
+        _description = "Lego Car";
+    }
+}
+
+public abstract class ToyFactory
+{
+    protected abstract Toy CreateToy(string type);
+    public Toy OrderToy(string type)
+    {
+        // declare first
+        Toy toy;
+        toy = CreateToy(type);
+
+        toy.Paint();
+        toy.Package();
+        return toy;
+    }
+}
+
+public class MattellToyFactory : ToyFactory
+{
+    protected override Toy CreateToy(string type)
+    {
+        Toy toy;
+        switch (type.ToLower())
         {
-            Console.WriteLine("NO AUTOMATIC ACCESS!!!");
-            return false;
+            case "doll":
+                toy = new BarbieDoll();
+                break;
+            case "car":
+                toy = new MatellCar();
+                break;
+            default:
+                throw new Exception("Mattell Toy Factory decided to stop producing this toy.");
         }
+        Console.WriteLine($"Created a {toy._description} from Mattell");
+        return toy;
+    }
+}
+
+public class LegoToyFactory : ToyFactory
+{
+    protected override Toy CreateToy(string type)
+    {
+        Toy toy;
+        switch (type)
+        {
+            case "doll":
+                toy = new Minifigure();
+                break;
+            case "car":
+                toy = new LegoCar();
+                break;
+            default :
+                throw new Exception("Mattell Toy Factory decided to stop producing this toy.");
+        }
+        Console.WriteLine($"Created a {toy._description} from Lego");
+        return toy;
     }
 }
