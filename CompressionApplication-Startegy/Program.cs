@@ -4,12 +4,17 @@
 //winnipeg.OrderPizza("special");
 //newfoundland.OrderPizza("special");
 
-ToyFactory lego = new LegoToyFactory();
-ToyFactory mattell = new MattellToyFactory();
-lego.OrderToy("doll");
-mattell.OrderToy("doll");
-lego.OrderToy("car");
-mattell.OrderToy("car");
+//ToyFactory lego = new LegoToyFactory();
+//ToyFactory mattell = new MattellToyFactory();
+//lego.OrderToy("doll");
+//mattell.OrderToy("doll");
+//lego.OrderToy("car");
+//mattell.OrderToy("car");
+ClientHandler retailHandler = new RetailClientHandler();
+ClientHandler enterpriseHandler = new EnterpriseHandler();
+Console.WriteLine(enterpriseHandler.CreateClient("MANAGER", "michael", true));
+
+
 
 public abstract class PizzaStore
 {
@@ -217,5 +222,137 @@ public class LegoToyFactory : ToyFactory
         }
         Console.WriteLine($"Created a {toy._description} from Lego");
         return toy;
+    }
+}
+
+public abstract class Client
+{
+    public string UserName { get; set; }
+    public string UserAuthString { get; set; } = "";
+    public bool HasAccess { get; set; }
+    public string BuildAuthString()
+    {
+        return "";
+    }
+}
+
+public class User : Client
+{
+    public User()
+    {
+        HasAccess = false;
+    }
+}
+
+public class Manager : Client
+{
+    public CheckString? checkString { get; set; }
+    public Manager(bool enterpriseClientHandler)
+    {
+        HasAccess = true;
+        UserAuthString = UserAuthString + "MAN";
+        if (enterpriseClientHandler)
+        {
+            checkString = new CheckString();
+        }
+    }
+}
+
+public class Admin : Client
+{
+    public Admin()
+    {
+        HasAccess = true;
+        UserAuthString = UserAuthString + "ADMIN";
+    }
+}
+
+public abstract class AccessBehaviour
+{
+    public Client client { get; set; }
+    protected abstract bool HandleAccess(Client client);
+}
+
+public class CheckString : AccessBehaviour
+{
+    protected override bool HandleAccess(Client client)
+    {
+        //if (enterpriseClientHandler && client.UserAuthString.Contains("MANAGER"))
+        //{
+        //    return true;
+        //}
+        if (client.UserAuthString.Contains("ADMIN"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
+
+public class SwitchAuth : AccessBehaviour
+{
+    protected override bool HandleAccess(Client client)
+    {
+        return client.HasAccess;
+    }
+}
+
+public class ClientFactory
+{
+    public Client CreateClient(string clientType, string userName, bool isManagerInEnterprise)
+    {
+        Client newClient;
+        switch (clientType)
+        {
+            case "USER":
+                newClient = new User();
+                newClient.UserName = userName;
+                break;
+            case "MANAGER":
+                newClient = new Manager(isManagerInEnterprise);
+                newClient.UserName = userName;
+                break;
+            case "ADMIN":
+                newClient = new Admin();
+                newClient.UserName = userName;
+                break;
+            default:
+                throw new Exception();
+        }
+        Console.WriteLine(newClient.BuildAuthString());
+        return newClient;
+    }
+}
+
+public abstract class ClientHandler
+{
+    public ClientFactory ClientFactory { get; set; }
+    public abstract Client CreateClient(string clientType, string userName, bool isManagerInEnterprise);
+}
+
+public class RetailClientHandler : ClientHandler
+{
+    public override Client CreateClient(string clientType, string userName, bool isManagerInEnterprise)
+    {
+        return ClientFactory.CreateClient(clientType, userName, isManagerInEnterprise);
+    }
+}
+
+public class EnterpriseHandler : ClientHandler
+{
+    public override Client CreateClient(string clientType, string userName, bool isManagerInEnterprise)
+    {
+        if (clientType == "MANAGER")
+        {
+            Client client = ClientFactory.CreateClient(clientType, userName, true);
+            return client;
+        }
+        else
+        {
+            return ClientFactory.CreateClient(clientType, userName, false);
+        }
     }
 }
